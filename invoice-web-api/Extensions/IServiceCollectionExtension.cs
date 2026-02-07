@@ -13,19 +13,13 @@ namespace invoice_web_api.Extensions
 {
     public static class IServiceCollectionExtension
     {
+
         public static void AddOptionsConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton(resolver =>
+            services.AddSingleton<OptionsServices>(resolver =>
             {
-
-                var mergedConfig = new ConfigurationBuilder()
-                .AddConfiguration(configuration)
-                .AddEnvironmentVariables()
-                .Build();
-
                 var options = new OptionsServices();
-                mergedConfig.Bind(options);
-
+                configuration.Bind(options);
                 return options;
             });
         }
@@ -42,13 +36,10 @@ namespace invoice_web_api.Extensions
 
         public static void AddDB(this IServiceCollection services, IConfiguration configuration)
         {
-            var mergedConfig = new ConfigurationBuilder()
-                .AddConfiguration(configuration)
-                .AddEnvironmentVariables()
-                .Build();
-
             var optionsServices = new OptionsServices();
-            mergedConfig.Bind(optionsServices);
+            configuration.Bind(optionsServices);
+
+            services.AddSingleton<OptionsServices>(optionsServices);
 
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(optionsServices.ConnectionString));
