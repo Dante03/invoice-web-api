@@ -13,7 +13,7 @@ builder.Services.AddServices();
 builder.Services.AddOptionsConfiguration(builder.Configuration);
 builder.Services.AddDB(builder.Configuration);
 builder.Services.AddJWTConfiguration();
-builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 app.UseSwagger();
