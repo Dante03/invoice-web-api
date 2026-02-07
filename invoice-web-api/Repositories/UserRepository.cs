@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace invoice_web_api.Repositories
 {
@@ -63,14 +64,33 @@ namespace invoice_web_api.Repositories
 
         public Result<User> Register(User user)
         {
+            User existUser = _context.Users.FirstOrDefault(u => u.Email.Equals(u.Email));
+
+            if (existUser != null)
+            {
+                return Result<User>.Fail(
+                    "Usuario ya existe",
+                    ErrorType.Validation
+                );
+            }
             if (user == null)
+            {
                 return Result<User>.Fail(
                     "Usuario nulo",
                     ErrorType.Validation
                 );
+            }
 
+            string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (string.IsNullOrEmpty(user.Email))
+            {
                 return Result<User>.Fail("El email es obligatorio", ErrorType.Validation);
+            }
+
+            if (!Regex.IsMatch(user.Email, pattern))
+            {
+                return Result<User>.Fail("El email no es válido", ErrorType.Validation);
+            }
 
             return Result<User>.Ok(user);
         }
