@@ -41,9 +41,6 @@ namespace invoice_web_api.Extensions
             configuration.Bind(optionsServices);
 
             services.AddSingleton<OptionsServices>(optionsServices);
-            Trace.WriteLine($"Connection String: {optionsServices.ConnectionString}");
-            ILogger logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger($"DatabaseConfiguration {optionsServices.ConnectionString}");
-            Console.WriteLine($"Connection String: {optionsServices.ConnectionString}");
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(optionsServices.ConnectionString));
         }
