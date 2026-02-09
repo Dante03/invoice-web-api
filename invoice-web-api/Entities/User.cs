@@ -27,5 +27,6 @@ namespace invoice_web_api.Entities
         public DateTime UpdatedAt { get; set; }
 
         public ICollection<Company> Companies { get; set; } = new List<Company>();
+        public ICollection<Client> Clients { get; set; } = new List<Client>();
     }
 }

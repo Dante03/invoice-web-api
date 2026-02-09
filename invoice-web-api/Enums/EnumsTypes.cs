@@ -6,4 +6,10 @@
         NotFound,
         Unauthorized
     }
+
+    public enum ServiceType
+    {
+        Service,
+        Prdouct
+    }
 }

@@ -40,6 +40,8 @@ namespace invoice_web_api.Entities
         public string Email { get; set; }
         [Column("logo")]
         public string Logo { get; set; }
+        public double Tax { get; set; }
+        public double Discount { get; set; }
         [Required]
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }

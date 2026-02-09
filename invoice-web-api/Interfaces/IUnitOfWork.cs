@@ -4,6 +4,10 @@
     {
         ISendMailService sendMailService { get; }
         IUserRepository UserRepository { get; }
+        ICompanyRepository CompanyRepository { get; }
+        IClientRepository ClientRepository { get; }
+        IInvoiceRepository InvoicetRepository { get; }
+        ISupabaseStorageService SupabaseStorageService { get; }
 
         Task<int> CompleteAsync();
     }

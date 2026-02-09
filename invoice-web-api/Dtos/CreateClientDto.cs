@@ -2,19 +2,16 @@
 
 namespace invoice_web_api.Dtos
 {
-    public class CreateCompanyDto
+    public class CreateClientDto
     {
         [Required]
-        public string CompanyName { get; set; } = null!;
+        public string ClientName { get; set; } = null!;
 
         [Required]
         public string FirstName { get; set; } = null!;
 
         [Required]
         public string LastName { get; set; } = null!;
-
-        [Required]
-        public string Website { get; set; } = null!;
 
         public string? CompanyAddress1 { get; set; }
         public string? CompanyAddress2 { get; set; }
@@ -23,15 +20,8 @@ namespace invoice_web_api.Dtos
         public string Country { get; set; } = null!;
 
         [Required]
-        public string Phone { get; set; } = null!;
-
-        [Required]
         [EmailAddress]
         public string Email { get; set; } = null!;
-        public string Tax { get; set; } = null!;
-        public string Discount { get; set; } = null!;
-
-        public string Logo { get; set; }
 
         public List<CreateInvoiceDto>? Invoices { get; set; }
     }

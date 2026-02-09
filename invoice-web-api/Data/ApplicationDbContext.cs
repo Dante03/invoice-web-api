@@ -9,8 +9,8 @@ namespace invoice_web_api.Data
         : base(options) { }
 
         public DbSet<User> Users => Set<User>();
-        //public DbSet<Client> Clients => Set<Client>();
+        public DbSet<Client> Clients => Set<Client>();
         public DbSet<Company> Companies => Set<Company>();
-        //public DbSet<Invoice> Invoices => Set<Invoice>();
+        public DbSet<Invoice> Invoices => Set<Invoice>();
     }
 }

@@ -1,4 +1,5 @@
-﻿using invoice_web_api.Data;
+﻿using Humanizer;
+using invoice_web_api.Data;
 using invoice_web_api.Dtos;
 using invoice_web_api.Entities;
 using invoice_web_api.Enums;
@@ -18,18 +19,18 @@ namespace invoice_web_api.Repositories
         {
         }
 
-        public override Task<User> Populate(CreateUserDto createUserDto)
+        public override Task<User?> Populate(CreateUserDto dto)
         {
             User user = new User()
             {
                 UserId = Guid.NewGuid(),
-                Email = createUserDto.Email,
-                Password = HashPassword(createUserDto.Password),
-                Role = createUserDto.Role,
+                Email = dto.Email,
+                Password = HashPassword(dto.Password),
+                Role = dto.Role,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Companies = createUserDto.Companies != null
-                ? createUserDto.Companies.Select(c => new Company
+                Companies = dto.Companies != null
+                ? dto.Companies.Select(c => new Company
                 {
                     CompanyId = Guid.NewGuid(),
                     CompanyName = c.CompanyName,
@@ -41,10 +42,20 @@ namespace invoice_web_api.Repositories
                     Country = c.Country,
                     Phone = c.Phone,
                     Email = c.Email,
+                    Logo = c.Logo.FileName,
+                    Tax = c.Tax,
+                    Discount = c.Discount,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     Invoices = c.Invoices != null
-                    ? c.Invoices.Select(i => new Invoice { }).ToList()
+                    ? c.Invoices.Select(i => new Invoice {
+                        InvoiceId = Guid.NewGuid(),
+                        InvoiceNumber = i.InvoiceNumber,
+                        Name = i.Name,
+                        Directory = i.Directory,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    }).ToList()
                     : new List<Invoice>()
                 }).ToList()
                 : new List<Company>()
@@ -64,7 +75,7 @@ namespace invoice_web_api.Repositories
 
         public Result<User> Register(User user)
         {
-            User existUser = _context.Users.FirstOrDefault(u => u.Email.Equals(u.Email));
+            User existUser = _context.Users.FirstOrDefault(u => u.Email.Equals(user.Email));
 
             if (existUser != null)
             {
@@ -97,7 +108,7 @@ namespace invoice_web_api.Repositories
 
         public Result<User> Login(LoginDto loginDto)
         {
-            User user = _context.Users.FirstOrDefault(user => user.Email.Equals(loginDto.User));
+            User user = _context.Users.FirstOrDefault(user => user.Email.Equals(loginDto.Email));
 
             if (user == null)
             {

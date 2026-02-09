@@ -45,7 +45,7 @@ namespace invoice_web_api.Controllers
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
             Result<User> result = _unitOfWork.UserRepository.Login(loginDto);
-            User user = _unitOfWork.UserRepository.Login(loginDto).Data;
+            User user = _unitOfWork.UserRepository.Login(loginDto).Data.FirstOrDefault() ?? new User();
 
             if (!result.Success)
             {
@@ -67,11 +67,35 @@ namespace invoice_web_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] CreateUserDto createUser)
+        public async Task<IActionResult> Register([FromBody] CreateUserDto createUser)
         {
             User user = _unitOfWork.UserRepository.Populate(createUser).Result ?? new User();
+            CreateCompanyWithFileDto company = createUser.Companies?.FirstOrDefault();
+
+            if (company != null)
+            {
+                var fileName = $"{Guid.NewGuid()}_{DateTime.UtcNow.ToString("yyyy_MM_dd_HHmmss")}";
+                string path = await _unitOfWork.SupabaseStorageService.UploadFile(company.Logo, fileName, "logos");
+                user.Companies.Clear();
+                user.Companies.Add(new Company
+                {
+                    CompanyName = company.CompanyName,
+                    FirstName = company.FirstName,
+                    LastName = company.LastName,
+                    Website = company.Website,
+                    CompanyAddress1 = company.CompanyAddress1,
+                    CompanyAddress2 = company.CompanyAddress2,
+                    Country = company.Country,
+                    Phone = company.Phone,
+                    Email = company.Email,
+                    Tax = company.Tax,
+                    Discount = company.Discount,
+                    Logo = path
+                });
+            }
 
             Result<User> result = _unitOfWork.UserRepository.Register(user);
+
 
             if (result.Success)
             {
@@ -85,13 +109,20 @@ namespace invoice_web_api.Controllers
 
             return result.ToActionResult();
 
-            
+
         }
 
         [HttpPost("logout")]
         public IActionResult Logout()
         {
             Response.Cookies.Delete("access_token");
+            return Ok();
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var invoices = _unitOfWork.UserRepository.GetAllAsync().Result;
             return Ok();
         }
     }

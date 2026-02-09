@@ -14,6 +14,6 @@ namespace invoice_web_api.Dtos
 
         public string Role { get; set; } = "User";
 
-        public List<CreateCompanyDto>? Companies { get; set; }
+        public List<CreateCompanyWithFileDto>? Companies { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace invoice_web_api.Dtos
 {
-    public class CreateCompanyDto
+    public class CreateCompanyWithFileDto
     {
         [Required]
         public string CompanyName { get; set; } = null!;
@@ -28,10 +28,10 @@ namespace invoice_web_api.Dtos
         [Required]
         [EmailAddress]
         public string Email { get; set; } = null!;
-        public string Tax { get; set; } = null!;
-        public string Discount { get; set; } = null!;
+        public double Tax { get; set; }
+        public double Discount { get; set; }
 
-        public string Logo { get; set; }
+        public IFormFile Logo { get; set; }
 
         public List<CreateInvoiceDto>? Invoices { get; set; }
     }
