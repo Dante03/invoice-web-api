@@ -22,13 +22,14 @@ namespace invoice_web_api.Dtos
             Success = true,
             DataList = dataList
         };
-        public static Result<T> Fail(string code, string error, ErrorType errorType)
+        public static Result<T> Fail(string code, string error, ErrorType errorType, T? data = default)
         => new Result<T>
         {
             Code = code,
             Success = false,
             Error = error,
-            ErrorType = errorType
+            ErrorType = errorType,
+            Data = data
         };
 
         public static Result<T> NotFound(string code, string error, ErrorType errorType)

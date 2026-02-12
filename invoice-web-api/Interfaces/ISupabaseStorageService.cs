@@ -3,6 +3,7 @@
     public interface ISupabaseStorageService
     {
         Task<string> UploadFile(IFormFile file, string fileName, string directory);
-        Task<string> DownloadFile(string path);
+        Task<byte[]> DownloadFile(string path);
+        Task<string> ViewFile(string path);
     }
 }

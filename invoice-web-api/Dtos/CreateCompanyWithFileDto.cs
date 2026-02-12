@@ -4,6 +4,7 @@ namespace invoice_web_api.Dtos
 {
     public class CreateCompanyWithFileDto
     {
+        public string? CompanyId { get; set; }
         [Required]
         public string CompanyName { get; set; } = null!;
 

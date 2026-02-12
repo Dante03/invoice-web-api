@@ -35,7 +35,7 @@ namespace invoice_web_api.Services
             return path;
         }
 
-        public async Task<string> DownloadFile(string path)
+        public async Task<string> ViewFile(string path)
         {
             await _supabase.InitializeAsync();
 
@@ -44,6 +44,18 @@ namespace invoice_web_api.Services
             var signedUrl = await _supabase.Storage
                 .From(bucket)
                 .CreateSignedUrl(path, 300); // segundos
+            return signedUrl;
+        }
+
+        public async Task<byte[]> DownloadFile(string path)
+        {
+            var client = await _supabase.InitializeAsync();
+            var storage = client.Storage;
+            var bucket = _option.SUPABASE_BUCKET;
+            var bucketClient = storage.From(bucket);
+
+
+            var signedUrl = await bucketClient.Download(path, null);
             return signedUrl;
         }
     }

@@ -1,9 +1,11 @@
 ﻿using invoice_web_api.Dtos;
 using invoice_web_api.Entities;
+using invoice_web_api.Enums;
 using invoice_web_api.Extensions;
 using invoice_web_api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -24,7 +26,7 @@ namespace invoice_web_api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] CreateCompanyWithFileDto dto)
         {
-
+            
             Company company = _unitOfWork.CompanyRepository.Populate(dto).Result ?? new Company();
 
             var fileName = $"{Guid.NewGuid()}_{DateTime.UtcNow.ToString("yyyy_MM_dd_HHmmss")}";
@@ -32,8 +34,24 @@ namespace invoice_web_api.Controllers
             company.Logo = path;
             Result<Company> result = _unitOfWork.CompanyRepository.Create(company);
 
-            if (result.Success)
+            if (result.Success || (!string.IsNullOrEmpty(result.Code) ? result.Code.Equals("INV0032") : false))
             {
+                var user = User;
+                var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+                User getUser = await _unitOfWork.UserRepository.GetByIdAsync(Guid.TryParse(id, out Guid userId) ? userId : Guid.NewGuid());
+
+                if (getUser == null)
+                {
+                    return BadRequest(new
+                    {
+                        Success = false,
+                        Code = "INV0001",
+                        ErrorType = ErrorType.NotFound,
+                        Error = "User not found"
+                    });
+                }
+                
+                company.UserId = getUser.UserId;
                 await _unitOfWork.CompanyRepository.AddAsync(company);
                 await _unitOfWork.CompleteAsync();
             }
@@ -42,7 +60,7 @@ namespace invoice_web_api.Controllers
                 return BadRequest(result);
             }
 
-            return result.ToActionResult();
+            return Ok(result);
         }
 
         [HttpGet("get-all")]
@@ -59,7 +77,7 @@ namespace invoice_web_api.Controllers
             }
             else
             {
-                Console.WriteLine("GUID inválido");
+                return BadRequest("Invalid user ID");
             }
 
             Result<Company> company = _unitOfWork.CompanyRepository.GetCompanyByUserIdAsync(userId);

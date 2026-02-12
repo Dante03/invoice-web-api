@@ -6,6 +6,7 @@ namespace invoice_web_api.Dtos
     public class CreateInvoiceDto
     {
         // Company info
+        public string? CompanyId { get; set; }
         public string CompanyName { get; set; } = default!;
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;

@@ -67,6 +67,7 @@ namespace invoice_web_api.Controllers
 
             Company company = await _unitOfWork.CompanyRepository.Populate(new CreateCompanyWithFileDto()
             {
+                CompanyId = dto.CompanyId,
                 CompanyName = dto.CompanyName,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
@@ -82,13 +83,17 @@ namespace invoice_web_api.Controllers
             company.Logo = path;
             Result<Company> resultCompany = _unitOfWork.CompanyRepository.Create(company);
 
-            if (!resultCompany.Success)
+            if (!string.IsNullOrEmpty(resultCompany.Code))
             {
-                return BadRequest(new
+                if (resultCompany.Code.Equals("INV0006"))
                 {
-                    Code = resultCompany.Code,
-                    Error = resultCompany.Error
-                });
+
+                    return BadRequest(new
+                    {
+                        Code = resultCompany.Code,
+                        Error = resultCompany.Error
+                    });
+                }
             }
 
             //Register Invoice
@@ -115,9 +120,16 @@ namespace invoice_web_api.Controllers
             dto.Directory = path;
             Invoice? invoice = await _unitOfWork.InvoicetRepository.Populate(dto);
             invoice.CompanyId = resultCompany.Data.CompanyId;
-            invoice.Company = resultCompany.Data;
-            invoice.Company.User = existUser;
-            invoice.Company.UserId = existUser.UserId;
+            
+            if (!string.IsNullOrEmpty(resultCompany.Code))
+            {
+                if (resultCompany.Code.Equals("INV0032"))
+                {
+                    invoice.Company = resultCompany.Data;
+                    invoice.Company.User = existUser;
+                    invoice.Company.UserId = existUser.UserId;
+                }
+            }
 
             Result<Invoice> resultInvoice = _unitOfWork.InvoicetRepository.Create(invoice);
             await _unitOfWork.CompleteAsync();
@@ -134,16 +146,48 @@ namespace invoice_web_api.Controllers
             }
         }
 
+        [HttpGet()]
+        public async Task<IActionResult> GetAll()
+        {
+            
+            var user = User;
+            User? existUser = await _unitOfWork.UserRepository.GetByIdAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier ?? string.Empty) ?? string.Empty));
+            Result<IEnumerable<Invoice>> invoice = _unitOfWork.InvoicetRepository.GetAllByUser(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier ?? string.Empty) ?? string.Empty));
+
+            var dto = invoice.Data
+            .Select(i => new InvoiceDto
+            {
+                InvoiceId = i.InvoiceId.ToString(),
+                InvoiceNumber = int.Parse(i.InvoiceNumber),
+                Name = i.Name,
+                Type = i.Type
+            });
+            return Ok(dto);
+        }
+
+        [HttpGet("view/{id}")]
+        public async Task<IActionResult> ViewFile([FromRoute] Guid id)
+        {
+            var user = User;
+            User? existUser = await _unitOfWork.UserRepository.GetByIdAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier ?? string.Empty) ?? string.Empty));
+
+            Invoice invoice = _unitOfWork.InvoicetRepository.GetById(id, existUser.UserId).Data;
+            string url = await _unitOfWork.SupabaseStorageService.ViewFile(invoice.Directory);
+            return Ok( new
+            {
+                Url = url
+            });
+        }
+
         [HttpGet("download/{id}")]
         public async Task<IActionResult> Download([FromRoute] Guid id)
         {
-            Invoice invoice = _unitOfWork.InvoicetRepository.GetById(id).Data;
-            string url = await _unitOfWork.SupabaseStorageService.DownloadFile(invoice.Directory);
-            return Ok( new
-            {
-                url = url,
-                mensaje = "Archivo descargado correctamente"
-            });
+            var user = User;
+            User? existUser = await _unitOfWork.UserRepository.GetByIdAsync(Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier ?? string.Empty) ?? string.Empty));
+
+            Invoice invoice = _unitOfWork.InvoicetRepository.GetById(id, existUser.UserId).Data;
+            byte[] fileBytes = await _unitOfWork.SupabaseStorageService.DownloadFile(invoice.Directory);
+            return File(fileBytes, "application/pdf", invoice.Name);
         }
     }
  }

@@ -5,6 +5,7 @@ using invoice_web_api.Entities;
 using invoice_web_api.Enums;
 using invoice_web_api.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 
 namespace invoice_web_api.Repositories
@@ -19,7 +20,7 @@ namespace invoice_web_api.Repositories
         {
             Company company = new Company
             {
-                CompanyId = Guid.NewGuid(),
+                CompanyId = Guid.TryParse(dto.CompanyId, out Guid id) ? id : Guid.NewGuid(),
                 CompanyName = dto.CompanyName,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
@@ -51,16 +52,55 @@ namespace invoice_web_api.Repositories
 
         public Result<Company> Create(Company company)
         {
-            Company existEmail = _context.Companies.FirstOrDefault(c => c.Email.Equals(company.Email));
+            var query = _context.Companies;
+            Company existsCompany = query.FirstOrDefault(c => c.CompanyId.Equals(company.CompanyId));
 
-            if (existEmail != null)
+            if (existsCompany != null)
+            {
+                return Result<Company>.Ok(
+                    company
+                );
+            }
+
+            if (existsCompany != null)
+            {
+                if (query.Any(c => c.Email.Equals(company.Email)))
+                {
+                    return Result<Company>.Fail(
+                        "INV0006",
+                        "La compañia no puede ser registrada, intenta con otro correo.",
+                        ErrorType.Validation
+                    );
+                }
+                else
+                {
+                    return Result<Company>.Fail(
+                        "INV0031",
+                        "El correo de esta compañia no esta registrado.",
+                        ErrorType.Validation
+                    );
+                }
+            }
+
+            if (query.Any(c => c.Email.Equals(company.Email)))
             {
                 return Result<Company>.Fail(
                     "INV0006",
-                    "La compañia no puede ser registrada con el mismo correo",
+                    "La compañia no puede ser registrada, intenta con otro correo.",
                     ErrorType.Validation
                 );
             }
+
+            if (!query.Any(c => c.Email.Equals(company.Email)) && existsCompany == null)
+            {
+                return Result<Company>.Fail(
+                    "INV0032",
+                    "La compañia no se encuentra registrada.",
+                    ErrorType.Validation,
+                    company
+                );
+            }
+
             if (company == null)
             {
                 return Result<Company>.Fail(
