@@ -50,9 +50,9 @@ namespace invoice_web_api.Repositories
                     Invoices = c.Invoices != null
                     ? c.Invoices.Select(i => new Invoice {
                         InvoiceId = Guid.NewGuid(),
-                        InvoiceNumber = i.InvoiceNumber,
-                        Name = i.Name,
-                        Directory = i.Directory,
+                        InvoiceNumber = i.InvoiceNumber.ToString(),
+                        Name = "",
+                        Directory = "",
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     }).ToList()
@@ -80,6 +80,7 @@ namespace invoice_web_api.Repositories
             if (existUser != null)
             {
                 return Result<User>.Fail(
+                    "INV0019",
                     "Usuario ya existe",
                     ErrorType.Validation
                 );
@@ -87,6 +88,7 @@ namespace invoice_web_api.Repositories
             if (user == null)
             {
                 return Result<User>.Fail(
+                    "INV0020",
                     "Usuario nulo",
                     ErrorType.Validation
                 );
@@ -95,12 +97,14 @@ namespace invoice_web_api.Repositories
             string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (string.IsNullOrEmpty(user.Email))
             {
-                return Result<User>.Fail("El email es obligatorio", ErrorType.Validation);
+                return Result<User>.Fail(
+                    "INV0021", "El email es obligatorio", ErrorType.Validation);
             }
 
             if (!Regex.IsMatch(user.Email, pattern))
             {
-                return Result<User>.Fail("El email no es válido", ErrorType.Validation);
+                return Result<User>.Fail(
+                    "INV0022", "El email no es válido", ErrorType.Validation);
             }
 
             return Result<User>.Ok(user);
@@ -113,6 +117,7 @@ namespace invoice_web_api.Repositories
             if (user == null)
             {
                 return Result<User>.Fail(
+                    "INV0023",
                     "No existe el usuario",
                     ErrorType.Validation
                 );
@@ -120,6 +125,7 @@ namespace invoice_web_api.Repositories
             if (!IsValidPassword(loginDto.Password, user.Password))
             {
                 return Result<User>.Fail(
+                    "INV0024",
                     "La contraeña no coincide",
                     ErrorType.Validation
                 );

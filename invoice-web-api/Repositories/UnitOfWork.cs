@@ -15,6 +15,7 @@ namespace invoice_web_api.Repositories
         private ClientRepository? _clientRepository;
         private InvoiceRepository? _invoiceRepository;
         private SupabaseStorageService? _supabaseStorageService;
+        private InvoicePdfService? _invoicePdfService;
         private readonly ILogger<UnitOfWork> _logger;
         private readonly IWebHostEnvironment _env;
         private readonly HttpClient _http;
@@ -37,6 +38,7 @@ namespace invoice_web_api.Repositories
 
         public IInvoiceRepository InvoicetRepository => _invoiceRepository ??= new InvoiceRepository(_context);
         public ISupabaseStorageService SupabaseStorageService => _supabaseStorageService ??= new SupabaseStorageService(_options);
+        public IInvoicePdfService InvoicePdfService => _invoicePdfService ??= new InvoicePdfService();
 
         public async Task<int> CompleteAsync()
             => _context.SaveChanges();

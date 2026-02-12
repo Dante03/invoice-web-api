@@ -20,6 +20,9 @@ namespace invoice_web_api.Entities
         [Column("directory")]
         public string Directory { get; set; }
         [Required]
+        [Column("type")]
+        public string Type { get; set; }
+        [Required]
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
         [Required]
@@ -29,8 +32,5 @@ namespace invoice_web_api.Entities
         [Column("company_id")]
         public Guid CompanyId { get; set; }
         public Company Company { get; set; } = null!;
-        [Column("client_id")]
-        public Guid ClientId { get; set; }
-        public Client Client { get; set; } = null!;
     }
 }

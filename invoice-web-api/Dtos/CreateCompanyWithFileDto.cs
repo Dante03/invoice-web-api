@@ -33,6 +33,6 @@ namespace invoice_web_api.Dtos
 
         public IFormFile Logo { get; set; }
 
-        public List<CreateInvoiceDto>? Invoices { get; set; }
+        public List<CreateInvoiceDto>? Invoices { get; set; } = new List<CreateInvoiceDto>();
     }
 }

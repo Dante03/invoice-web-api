@@ -27,16 +27,6 @@ namespace invoice_web_api.Repositories
                 Email = dto.Email,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Invoices = dto.Invoices != null
-                    ? dto.Invoices.Select(i => new Invoice {
-                    InvoiceId = Guid.NewGuid(),
-                    InvoiceNumber = i.InvoiceNumber,
-                    Name = i.Name,
-                    Directory = i.Directory,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    }).ToList()
-                    : new List<Invoice>()
             };
             return Task.FromResult<Client?>(client);
         }
@@ -48,6 +38,7 @@ namespace invoice_web_api.Repositories
             if (existEmail != null)
             {
                 return Result<Client>.Fail(
+                    "INV0001",
                     "El cliente no puede ser registrado con el mismo correo",
                     ErrorType.Validation
                 );
@@ -55,6 +46,7 @@ namespace invoice_web_api.Repositories
             if (client == null)
             {
                 return Result<Client>.Fail(
+                    "INV0002",
                     "Compañia vacia",
                     ErrorType.Validation
                 );
@@ -63,12 +55,14 @@ namespace invoice_web_api.Repositories
             string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             if (string.IsNullOrEmpty(client.Email))
             {
-                return Result<Client>.Fail("El email es obligatorio", ErrorType.Validation);
+                return Result<Client>.Fail(
+                    "INV0003", "El email es obligatorio", ErrorType.Validation);
             }
 
             if (!Regex.IsMatch(client.Email, pattern))
             {
-                return Result<Client>.Fail("El email no es válido", ErrorType.Validation);
+                return Result<Client>.Fail(
+                    "INV0004", "El email no es válido", ErrorType.Validation);
             }
 
             return Result<Client>.Ok(client);
@@ -78,7 +72,8 @@ namespace invoice_web_api.Repositories
         {
             if (clients == null || !clients.Any())
             {
-                return Result<Client>.Fail("No se cuentan con registros", ErrorType.NotFound);
+                return Result<Client>.Fail(
+                    "INV0005", "No se cuentan con registros", ErrorType.NotFound);
             }
             return Result<Client>.Ok(clients);
         }

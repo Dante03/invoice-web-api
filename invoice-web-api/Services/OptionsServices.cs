@@ -10,5 +10,7 @@
         public string JWTAUDIENCE { get; set; }
         public string ConnectionString { get; set; }
         public double ExpireMinutes { get; set; }
+        public string ApiKeyEmail { get; set; }
+        public string From { get; set; }
     }
 }

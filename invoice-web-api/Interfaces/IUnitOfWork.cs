@@ -8,6 +8,7 @@
         IClientRepository ClientRepository { get; }
         IInvoiceRepository InvoicetRepository { get; }
         ISupabaseStorageService SupabaseStorageService { get; }
+        IInvoicePdfService InvoicePdfService { get; }
 
         Task<int> CompleteAsync();
     }

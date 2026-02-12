@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using invoice_web_api.Data;
@@ -11,9 +12,11 @@ using invoice_web_api.Data;
 namespace invoice_web_api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212123852_AddColumns")]
+    partial class AddColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,6 +171,10 @@ namespace invoice_web_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("invoice_id");
 
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("client_id");
+
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uuid")
                         .HasColumnName("company_id");
@@ -201,6 +208,8 @@ namespace invoice_web_api.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("InvoiceId");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("CompanyId");
 
@@ -267,13 +276,26 @@ namespace invoice_web_api.Migrations
 
             modelBuilder.Entity("invoice_web_api.Entities.Invoice", b =>
                 {
+                    b.HasOne("invoice_web_api.Entities.Client", "Client")
+                        .WithMany("Invoices")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("invoice_web_api.Entities.Company", "Company")
                         .WithMany("Invoices")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Client");
+
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("invoice_web_api.Entities.Client", b =>
+                {
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("invoice_web_api.Entities.Company", b =>

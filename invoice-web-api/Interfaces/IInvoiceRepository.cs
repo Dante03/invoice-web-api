@@ -8,6 +8,6 @@ namespace invoice_web_api.Interfaces
         Task<Invoice?> Populate(CreateInvoiceDto dto);
         Result<Invoice> Create(Invoice invoice);
         Result<Invoice> GetAll(IEnumerable<Invoice> invoice);
-        Result<Invoice> GetById(Invoice invoice);
+        Result<Invoice> GetById(Guid invoice);
     }
 }

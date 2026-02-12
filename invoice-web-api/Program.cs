@@ -3,7 +3,7 @@ using invoice_web_api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

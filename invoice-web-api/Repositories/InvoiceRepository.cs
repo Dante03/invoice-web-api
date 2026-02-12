@@ -17,9 +17,10 @@ namespace invoice_web_api.Repositories
             Invoice invoice = new Invoice
             {
                 InvoiceId = Guid.NewGuid(),
-                InvoiceNumber = dto.InvoiceNumber,
-                Name = dto.Name,
-                Directory = dto.Directory,
+                InvoiceNumber = dto.InvoiceNumber.ToString(),
+                Name = dto.Name ?? string.Empty,
+                Directory = dto.Directory ?? string.Empty,
+                Type = dto.Items.FirstOrDefault()?.Type,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -31,10 +32,12 @@ namespace invoice_web_api.Repositories
             if (invoice == null)
             {
                 return Result<Invoice>.Fail(
+                    "INV0016",
                     "Factura vacia",
                     ErrorType.Validation
                 );
             }
+            _context.Invoices.Add(invoice);
             return Result<Invoice>.Ok(invoice);
         }
 
@@ -43,6 +46,7 @@ namespace invoice_web_api.Repositories
             if (invoice == null)
             {
                 return Result<Invoice>.Fail(
+                    "INV0017",
                     "Registros no encontrados.",
                     ErrorType.Validation
                 );
@@ -50,12 +54,13 @@ namespace invoice_web_api.Repositories
             return Result<Invoice>.Ok(invoice);
         }
 
-        public Result<Invoice> GetById(Invoice invoice)
+        public Result<Invoice> GetById(Guid id)
         {
-            invoice = _context.Invoices.FirstOrDefault(i => i.InvoiceId == invoice.InvoiceId);
+            Invoice invoice = _context.Invoices.FirstOrDefault(i => i.InvoiceId == id);
             if (invoice == null)
             {
                 return Result<Invoice>.Fail(
+                    "INV0018",
                     "Factura no encontrada.",
                     ErrorType.NotFound
                 );

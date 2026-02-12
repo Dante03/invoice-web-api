@@ -42,6 +42,5 @@ namespace invoice_web_api.Entities
         [Column("user_id")]
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
-        public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }
 }

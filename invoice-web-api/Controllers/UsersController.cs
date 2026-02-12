@@ -45,14 +45,13 @@ namespace invoice_web_api.Controllers
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
             Result<User> result = _unitOfWork.UserRepository.Login(loginDto);
-            User user = _unitOfWork.UserRepository.Login(loginDto).Data.FirstOrDefault() ?? new User();
 
             if (!result.Success)
             {
                 return BadRequest();
             }
 
-            var token = _unitOfWork.UserRepository.GenerateJwt(user, _optionsServices);
+            var token = _unitOfWork.UserRepository.GenerateJwt(result.Data, _optionsServices);
 
             Response.Cookies.Append("access_token", token, new CookieOptions
             {
@@ -67,7 +66,7 @@ namespace invoice_web_api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] CreateUserDto createUser)
+        public async Task<IActionResult> Register([FromForm] CreateUserDto createUser)
         {
             User user = _unitOfWork.UserRepository.Populate(createUser).Result ?? new User();
             CreateCompanyWithFileDto company = createUser.Companies?.FirstOrDefault();
@@ -99,15 +98,15 @@ namespace invoice_web_api.Controllers
 
             if (result.Success)
             {
-                _unitOfWork.UserRepository.AddAsync(user);
-                _unitOfWork.CompleteAsync();
+                await _unitOfWork.UserRepository.AddAsync(user);
+                await _unitOfWork.CompleteAsync();
             }
             else
             {
                 return BadRequest(result);
             }
 
-            return result.ToActionResult();
+            return Ok(CreatedAtAction("CreateUser",createUser));
 
 
         }
