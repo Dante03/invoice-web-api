@@ -126,7 +126,7 @@ namespace invoice_web_api.Controllers
             {
 
                 await _unitOfWork.sendMailService.SendEmailAsync(dto, "Hola nuevo PDF", "Adjunto PDF", fileBytes, fileName);
-                return Ok(File(fileBytes, "application/pdf", fileName));
+                return File(fileBytes, "application/pdf", fileName);
             }
             else
             {
