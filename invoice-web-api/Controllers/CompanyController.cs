@@ -26,7 +26,7 @@ namespace invoice_web_api.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] CreateCompanyWithFileDto dto)
         {
-            
+
             Company company = _unitOfWork.CompanyRepository.Populate(dto).Result ?? new Company();
 
             var fileName = $"{Guid.NewGuid()}_{DateTime.UtcNow.ToString("yyyy_MM_dd_HHmmss")}";
@@ -50,7 +50,7 @@ namespace invoice_web_api.Controllers
                         Error = "User not found"
                     });
                 }
-                
+
                 company.UserId = getUser.UserId;
                 await _unitOfWork.CompanyRepository.AddAsync(company);
                 await _unitOfWork.CompleteAsync();
@@ -60,7 +60,7 @@ namespace invoice_web_api.Controllers
                 return BadRequest(result);
             }
 
-            return Ok(result);
+            return Ok();
         }
 
         [HttpGet("get-all")]
@@ -117,6 +117,18 @@ namespace invoice_web_api.Controllers
             }
             await _unitOfWork.CompleteAsync();
             return Ok(CreatedAtAction("Update Company", dto));
+        }
+
+        [HttpGet("logo/{companyId}")]
+        public async Task<IActionResult> GetLogoById([FromRoute] Guid companyId)
+        {
+            Result<Company> result = _unitOfWork.CompanyRepository.GetByIdAsync(companyId);
+            if (!result.Success)
+            {
+                return result.ToActionResult();
+            }
+            byte[] fileBytes = await _unitOfWork.SupabaseStorageService.DownloadFile(result.Data.Logo);
+            return File(fileBytes, "image/*", result.Data.Logo.Split("/")[1]);
         }
     }
 }
