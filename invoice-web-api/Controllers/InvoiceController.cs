@@ -146,6 +146,7 @@ namespace invoice_web_api.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet()]
         public async Task<IActionResult> GetAll()
         {
@@ -165,6 +166,7 @@ namespace invoice_web_api.Controllers
             return Ok(dto);
         }
 
+        [Authorize]
         [HttpGet("view/{id}")]
         public async Task<IActionResult> ViewFile([FromRoute] Guid id)
         {
@@ -179,6 +181,7 @@ namespace invoice_web_api.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("download/{id}")]
         public async Task<IActionResult> Download([FromRoute] Guid id)
         {
