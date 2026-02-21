@@ -50,25 +50,24 @@ namespace invoice_web_api.Services
                         .FontSize(28)
                         .Bold();
 
+                    col.Spacing(5);
+                    col.Item().Text(_invoice.CompanyName).FontSize(22).Bold();
+                    col.Item().Text($"{_invoice.FirstName} {_invoice.LastName}").FontSize(10);
+                    col.Item().Text(_invoice.Website).FontSize(10);
+                    col.Item().Text(_invoice.CompanyAddress1).FontSize(10);
+                    col.Item().Text(_invoice.CompanyAddress2).FontSize(10);
+                    col.Item().Text(_invoice.Country).FontSize(10);
+                    col.Item().Text(_invoice.Phone).FontSize(10);
+                    col.Item().Text(_invoice.Email).FontSize(10);
 
-                    col.Item().Text(_invoice.CompanyName);
-                    col.Item().Text($"{_invoice.FirstName}, {_invoice.LastName}");
-                    col.Item().Text(_invoice.Website);
-                    col.Item().Text(_invoice.CompanyAddress1);
-                    col.Item().Text(_invoice.CompanyAddress2);
-                    col.Item().Text(_invoice.Country);
-                    col.Item().Text(_invoice.Phone);
+                    col.Item().PaddingTop(20);
 
-                    col.Item().PaddingTop(15).Text("")
-                        .FontSize(12)
-                        .SemiBold()
-                        .FontColor(Colors.Grey.Darken1);
-
-                    col.Item().Text($"{_invoice.FirstNameClient}, {_invoice.LastNameClient}");
-                    col.Item().Text(_invoice.ClientAddress1);
-                    col.Item().Text(_invoice.ClientAddress2);
-                    col.Item().Text(_invoice.Country);
-                    col.Item().Text(_invoice.Email);
+                    col.Item().Text(_invoice.ClientCompanyName).FontSize(22).Bold();
+                    col.Item().Text($"{_invoice.FirstNameClient} {_invoice.LastNameClient}").FontSize(10);
+                    col.Item().Text(_invoice.ClientAddress1).FontSize(10);
+                    col.Item().Text(_invoice.ClientAddress2).FontSize(10);
+                    col.Item().Text(_invoice.ClientCountry).FontSize(10);
+                    col.Item().Text(_invoice.ClientEmail).FontSize(10);
             });
 
                 row.RelativeItem(1).AlignRight().Column(col =>
