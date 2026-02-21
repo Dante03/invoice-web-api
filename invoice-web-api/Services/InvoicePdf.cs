@@ -35,8 +35,8 @@ namespace invoice_web_api.Services
 
                     col.Item().Element(Header);
                     col.Item().Element(ItemsTable);
-                    col.Item().Element(FooterSection);
                 });
+                page.Footer().Element(FooterSection);
             });
         }
 
